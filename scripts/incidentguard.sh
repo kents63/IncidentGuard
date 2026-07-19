@@ -1,9 +1,28 @@
 #!/bin/bash
 
-echo "========================================="
-echo "Incident Guard Script v1.0"
-echo " Automated Incident Validator"
-echo "========================================="
+display_banner() {
+    echo "========================================="
+    echo "Incident Guard Script v1.0"
+    echo " Automated Incident Validator"
+    echo "========================================="
+}
+
+display_summary() {
+    echo " "
+    echo "============= Summary ============="
+    echo "Total Alerts: $(wc -l < alerts/alerts.csv)"
+    echo "Critical Alerts (P1): $(grep -c 'P1' alerts/alerts.csv)"
+    echo "High Priority Alerts (P2): $(grep -c 'P2' alerts/alerts.csv)"
+    echo "Low Priority Alerts (P3): $(grep -c 'P3' alerts/alerts.csv)"
+    echo "==================================="
+}
+display_banner
+
+total_alerts=0
+p1_alerts=0
+p2_alerts=0
+p3_alerts=0
+
 
 echo " "
 echo " System Started..."
@@ -40,3 +59,4 @@ while IFS=, read -r ticket service host severity; do
     fi   
     echo "-----------------------------------------"
 done < alerts/alerts.csv
+display_summary
