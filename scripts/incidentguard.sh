@@ -17,6 +17,11 @@ display_summary() {
     echo "==================================="
 }
 
+write_log() {
+    local message="$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $message" >> logs/incidentguard.log
+}
+
 total_alerts=0
 p1_alerts=0
 p2_alerts=0
@@ -24,7 +29,8 @@ p3_alerts=0
 
 display_banner
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') INFO incidentGuard Started" > logs/incidentguard.log
+:> logs/incidentguard.log
+write_log "incidentGuard Started"
 
 echo " "
 echo " System Started..."
@@ -42,7 +48,7 @@ while IFS=, read -r ticket service host severity; do
     if [ "$ticket" == "TicketID" ]; then
         continue
     fi
-    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO Processing Ticket $ticket" >> logs/incidentguard.log
+    write_log "Processing Ticket $ticket"
     ((total_alerts++))
     echo "TicketID: $ticket"
     echo "Service: $service"
@@ -65,6 +71,7 @@ while IFS=, read -r ticket service host severity; do
         echo "Action: Continue monitoring"
     fi   
     echo "-----------------------------------------"
+    write_log "Ticket $ticket classified as $severity"
 done < alerts/alerts.csv
 display_summary
-echo "$(date '+%Y-%m-%d %H:%M:%S') INFO incidentGuard Completed" >> logs/incidentguard.log
+write_log "incidentGuard Completed"
