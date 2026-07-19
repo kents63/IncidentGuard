@@ -10,19 +10,21 @@ display_banner() {
 display_summary() {
     echo " "
     echo "============= Summary ============="
-    echo "Total Alerts: $(wc -l < alerts/alerts.csv)"
-    echo "Critical Alerts (P1): $(grep -c 'P1' alerts/alerts.csv)"
-    echo "High Priority Alerts (P2): $(grep -c 'P2' alerts/alerts.csv)"
-    echo "Low Priority Alerts (P3): $(grep -c 'P3' alerts/alerts.csv)"
+    echo "Total Alerts Processed: $total_alerts"
+    echo "Critical Alerts (P1): $p1_alerts"
+    echo "High Priority Alerts (P2): $p2_alerts"
+    echo "Low Priority Alerts (P3): $p3_alerts"
     echo "==================================="
 }
-display_banner
 
 total_alerts=0
 p1_alerts=0
 p2_alerts=0
 p3_alerts=0
 
+display_banner
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') INFO incidentGuard Started" > logs/incidentguard.log
 
 echo " "
 echo " System Started..."
@@ -37,22 +39,27 @@ echo " "
 echo "============= Current Alerts ============="
 cat alerts/alerts.csv
 while IFS=, read -r ticket service host severity; do
-     if [ "$ticket" == "TicketID" ]; then
+    if [ "$ticket" == "TicketID" ]; then
         continue
     fi
+    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO Processing Ticket $ticket" >> logs/incidentguard.log
+    ((total_alerts++))
     echo "TicketID: $ticket"
     echo "Service: $service"
     echo "Host: $host"
     echo "Severity: $severity"
-    if [ "$severity" = "P1" ]; then 
+    if [ "$severity" = "P1" ]; then
+         ((p1_alerts++))
         echo "🚨 Critical Alert"
         echo "Team: Platform Operations"
         echo "Action: Escalte immediatley"
     elif [ "$severity" = "P2" ]; then
+         ((p2_alerts++))    
         echo "⚠️ High Priority"
         echo "Team: Support Enngineering"
         echo "Action: Investigate within SLA"
     else 
+        ((p3_alerts++))
         echo "✅ Low Priority"
         echo "Team: Monitoring"
         echo "Action: Continue monitoring"
@@ -60,3 +67,4 @@ while IFS=, read -r ticket service host severity; do
     echo "-----------------------------------------"
 done < alerts/alerts.csv
 display_summary
+echo "$(date '+%Y-%m-%d %H:%M:%S') INFO incidentGuard Completed" >> logs/incidentguard.log
