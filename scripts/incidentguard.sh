@@ -11,9 +11,9 @@ display_summary() {
     echo " "
     echo "============= Summary ============="
     echo "Total Alerts Processed: $total_alerts"
-    echo "Critical Alerts (P1): $p1_alerts"
-    echo "High Priority Alerts (P2): $p2_alerts"
-    echo "Low Priority Alerts (P3): $p3_alerts"
+    echo "Critical Alerts (P1): $p1_alerts ($((p1_alerts * 100 / total_alerts))%)"
+    echo "High Priority Alerts (P2): $p2_alerts ($((p2_alerts * 100 / total_alerts))%)"
+    echo "Low Priority Alerts (P3): $p3_alerts ($((p3_alerts * 100 / total_alerts))%)"
     echo "==================================="
 }
 
@@ -29,7 +29,7 @@ p3_alerts=0
 
 display_banner
 
-:> logs/incidentguard.log
+: > logs/incidentguard.log
 write_log "incidentGuard Started"
 
 echo " "
